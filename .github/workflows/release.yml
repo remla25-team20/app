@@ -26,7 +26,8 @@ jobs:
       - run: |
           IMG="ghcr.io/${{github.repository}}"
           IMG=${IMG@L} # lower case the image
-          docker build \
+          docker buildx build \
+          --platform linux/amd64,linux/arm64 \
           --build-arg gh_token=${{ secrets.GH_TOKEN }} \
           --tag $IMG:${{ env.version }} \
           --tag $IMG:${{ env.version_major }}.${{ env.version_minor }}.latest \
