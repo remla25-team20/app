@@ -29,7 +29,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       }
 
       const data = await response.json();
-      setResult(data);
+      setResult(data.prediction);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
