@@ -14,7 +14,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     setError(null);
 
     try {
-      const baseUrl = process.env.NEXT_PUBLIC_API_BASE_URL;
+      const baseUrl = '/model-service';
       if (!baseUrl) {
         throw new Error("API base URL is not configured");
       }
