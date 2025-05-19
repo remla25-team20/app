@@ -8,13 +8,31 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // base url
+  const baseUrl = '/model-service'; 
+
+  // Send Prometheus-style frontend event to backend
+  async function logFrontendMetric(eventName: string) {
+    try {
+      await fetch(`${baseUrl}/log-metric`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ event: eventName }),
+      });
+    } catch (err) {
+      console.warn("Metric logging failed:", err);
+    }
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
+    // log: user clicked submit
+    await logFrontendMetric("frontend_submit_clicked");
+
     try {
-      const baseUrl = '/model-service';
       if (!baseUrl) {
         throw new Error("API base URL is not configured");
       }
@@ -30,8 +48,14 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
       const data = await response.json();
       setResult(data.prediction);
+
+      // log: result was received
+      await logFrontendMetric("frontend_prediction_result");
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
+
+      // log: error occurred
+      await logFrontendMetric("frontend_prediction_error");
     } finally {
       setIsLoading(false);
     }
