@@ -8,10 +8,13 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  // base url
+  const baseUrl = '/model-service'; 
+
   // Send Prometheus-style frontend event to backend
   async function logFrontendMetric(eventName: string) {
     try {
-      await fetch(`/log-metric`, {
+      await fetch(`${baseUrl}/log-metric`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ event: eventName }),
@@ -30,7 +33,6 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     await logFrontendMetric("frontend_submit_clicked");
 
     try {
-      const baseUrl = '/model-service';
       if (!baseUrl) {
         throw new Error("API base URL is not configured");
       }
