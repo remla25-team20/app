@@ -8,6 +8,7 @@ const MAX_AGE = 60 * 60 // 1 hour
 // One implementation reused for every verb you export
 async function handler(request: NextRequest) {
   // Extract the path after /api/
+  console.log("Hit catchall route, request:", request)
   const pathname = request.nextUrl.pathname
   const apiPrefix = '/api/'
   const upstreamPath = pathname.startsWith(apiPrefix) ? pathname.slice(apiPrefix.length) : ''
@@ -17,6 +18,7 @@ async function handler(request: NextRequest) {
   // ──── forward the request ────────────────────────────────────────────
   const cookieStore = await cookies()
   const cookie = cookieStore.get(COOKIE)?.value
+  console.log("Cookie:", cookie)
   const upstream = await fetch(target, {
     method: request.method,
     headers: {
@@ -43,6 +45,7 @@ async function handler(request: NextRequest) {
       sameSite: 'lax',
       path: '/',                       // every route
     })
+    console.log("Cookie set, updated cookieStore:", cookieStore.get(COOKIE)?.value)
   }
   return res
 }
