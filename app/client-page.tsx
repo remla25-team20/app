@@ -29,7 +29,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     fetch(`${baseUrl}/metrics/review-started`, {
       method: 'POST',
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ version: libVersion })
+      body: JSON.stringify({ version: 'blue-button' })
     });
   }, [])
 
@@ -61,7 +61,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       fetch(`${baseUrl}/metrics/review-submitted`, {
         method: 'POST',
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: libVersion })
+        body: JSON.stringify({ version: 'blue-button' })
       });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
