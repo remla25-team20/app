@@ -17,7 +17,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({ version: libVersion })
     });
-  })
+  }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
