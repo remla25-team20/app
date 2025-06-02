@@ -14,7 +14,6 @@ async function handler(request: NextRequest) {
   const upstreamPath = pathname.startsWith(apiPrefix) ? pathname.slice(apiPrefix.length) : ''
   const qs = request.url.split('?')[1] ?? ''
   const target = `http://${process.env.NEXT_PUBLIC_API_BASE_URL}/${upstreamPath}${qs && '?' + qs}`
-  console.log("Target:", target)
 
   // ──── forward the request ────────────────────────────────────────────
   const cookieStore = await cookies()
@@ -39,6 +38,8 @@ async function handler(request: NextRequest) {
 
   // persist the header → cookie (first hit only)
   const version = upstream.headers.get(HEADER)
+  console.log("Upstream headers:", upstream.headers)
+  console.log("Version:", version)
   if (version) {
     cookieStore.set({
       name: COOKIE,
