@@ -61,7 +61,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
           <button
             type="submit"
             disabled={isLoading}
-            className="w-full bg-blue-500 text-white py-2 px-4 rounded-lg hover:bg-blue-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
+            className="w-full bg-green-500 text-white py-2 px-4 rounded-lg hover:bg-green-600 disabled:bg-blue-300 disabled:cursor-not-allowed"
           >
             {isLoading ? "Analyzing..." : "Analyze Text"}
           </button>
