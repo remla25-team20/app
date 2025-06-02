@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [text, setText] = useState("");
@@ -8,17 +8,23 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
+  const baseUrl = '/model-service';
+
+  // send signal to collect experiment metrics
+  useEffect(() => {
+    fetch(`${baseUrl}/metrics/review-started`, {
+      method: 'POST',
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ version: libVersion })
+    });
+  })
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
 
     try {
-      const baseUrl = '/model-service';
-      if (!baseUrl) {
-        throw new Error("API base URL is not configured");
-      }
-
       const params = new URLSearchParams({ review: text });
       const response = await fetch(`${baseUrl}/predict?${params.toString()}`, {
         method: "POST",
@@ -30,6 +36,13 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
       const data = await response.json();
       setResult(data.prediction);
+
+      // send signal to collect experiment metrics
+      fetch(`${baseUrl}/metrics/review-submitted`, {
+        method: 'POST',
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ version: libVersion })
+      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
     } finally {
