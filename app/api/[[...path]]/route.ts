@@ -1,28 +1,29 @@
 import { cookies } from 'next/headers'
-import { NextResponse } from 'next/server'
+import { NextRequest, NextResponse } from 'next/server'
 
 const HEADER = 'x-version'
 const COOKIE = 'x-version'
 const MAX_AGE = 60 * 60 // 1 hour
 
 // One implementation reused for every verb you export
-async function handler(req: Request,
-  { params }: { params: { path?: string[] } }) {
-
-  const upstreamPath = (params.path ?? []).join('/')        // '' on /api
-  const qs = req.url.split('?')[1] ?? ''
+async function handler(request: NextRequest) {
+  // Extract the path after /api/
+  const pathname = request.nextUrl.pathname
+  const apiPrefix = '/api/'
+  const upstreamPath = pathname.startsWith(apiPrefix) ? pathname.slice(apiPrefix.length) : ''
+  const qs = request.url.split('?')[1] ?? ''
   const target = `/${upstreamPath}${qs && '?' + qs}`
 
   // ──── forward the request ────────────────────────────────────────────
   const cookieStore = await cookies()
   const cookie = cookieStore.get(COOKIE)?.value
   const upstream = await fetch(target, {
-    method: req.method,
+    method: request.method,
     headers: {
       // copy incoming headers you care about …
       [HEADER]: cookie ?? '',
     },
-    body: ['GET', 'HEAD'].includes(req.method) ? undefined : req.body,
+    body: ['GET', 'HEAD'].includes(request.method) ? undefined : request.body,
     redirect: 'manual',                  // so you pipe redirects too
   })
 
