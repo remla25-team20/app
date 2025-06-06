@@ -17,20 +17,16 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       await fetch(`${baseUrl}/log-metric`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ event: eventName }),
+        body: JSON.stringify({ event: eventName, version: process.env.APP_VERSION }),
       });
     } catch (err) {
       console.warn("Metric logging failed:", err);
     }
   }
 
-  // send signal to collect experiment metrics
+  // runs once on page loading
   useEffect(() => {
-    fetch(`${baseUrl}/metrics/review-started`, {
-      method: 'POST',
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ version: 'blue-button' })
-    });
+    logFrontendMetric('frontend_review_started')
   }, [])
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -56,13 +52,6 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
       // log: result was received
       await logFrontendMetric("frontend_prediction_result");
-
-      // send signal to collect experiment metrics
-      fetch(`${baseUrl}/metrics/review-submitted`, {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: 'blue-button' })
-      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
 
