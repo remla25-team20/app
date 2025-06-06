@@ -52,13 +52,6 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
       // log: result was received
       await logFrontendMetric("frontend_prediction_result");
-
-      // send signal to collect experiment metrics
-      fetch(`${baseUrl}/metrics/review-submitted`, {
-        method: 'POST',
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version: 'green-button' })
-      });
     } catch (err) {
       setError(err instanceof Error ? err.message : "An error occurred");
 
