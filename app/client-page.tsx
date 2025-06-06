@@ -9,7 +9,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [error, setError] = useState<string | null>(null);
 
   // base url
-  const baseUrl = '/model-service'; 
+  const baseUrl = "/model-service";
 
   // Send Prometheus-style frontend event to backend
   async function logFrontendMetric(eventName: string) {
