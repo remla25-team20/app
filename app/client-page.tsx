@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [text, setText] = useState("");
@@ -24,6 +24,11 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     }
   }
 
+  // runs once on page loading
+  useEffect(() => {
+    logFrontendMetric('frontend_review_started')
+  }, [])
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -33,10 +38,6 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     await logFrontendMetric("frontend_submit_clicked");
 
     try {
-      if (!baseUrl) {
-        throw new Error("API base URL is not configured");
-      }
-
       const params = new URLSearchParams({ review: text });
       const response = await fetch(`${baseUrl}/predict?${params.toString()}`, {
         method: "POST",
@@ -116,7 +117,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       </main>
 
       <footer className="mt-8 text-center text-sm text-gray-500">
-        <p>Version: {libVersion}</p>
+        <p>libVersion: {libVersion}</p>
       </footer>
     </div>
   );
