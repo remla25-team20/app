@@ -14,6 +14,9 @@ jobs:
     needs: ci
     steps:
       - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
       
       - name: Setup Node.js
         uses: actions/setup-node@v4
@@ -46,10 +49,4 @@ jobs:
       - name: Create new tag
         run: |
           git tag v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
-
-      - name: Push changes and tag
-        uses: ad-m/github-push-action@master
-        with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          push_only_tags: true
-          tags: true
+          git push origin --tags
