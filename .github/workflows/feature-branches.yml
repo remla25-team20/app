@@ -39,13 +39,13 @@ jobs:
       - name: Count previous branch tags
         id: counter
         run: |
-          COUNT=$(git tag --list "${{ steps.version.outputs.base }}-${{ steps.branch.outputs.branch }}.*" | wc -l)
+          COUNT=$(git tag --list "v${{ steps.version.outputs.base }}-${{ steps.branch.outputs.branch }}.*" | wc -l)
           NEXT=$((COUNT))
           echo "next=$NEXT" >> $GITHUB_OUTPUT
 
       - name: Create new tag
         run: |
-          git tag ${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
+          git tag v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
 
       - name: Push changes and tag
         uses: ad-m/github-push-action@v0.6.0
