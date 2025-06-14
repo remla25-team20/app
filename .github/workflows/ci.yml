@@ -2,6 +2,9 @@ name: CI
 
 on: [workflow_call]
 
+permissions:
+  packages: read
+
 jobs:
   build:
     runs-on: ubuntu-latest
