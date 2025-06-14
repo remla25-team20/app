@@ -45,7 +45,7 @@ jobs:
         id: bump-branch
         run: |
           NEW_VERSION=$(npm version prerelease --preid=${{ steps.branch.outputs.branch }} -n=${{ steps.counter.outputs.next }} --no-git-tag-version)
-          git tag ${{ NEW_VERSION }}
+          git tag $NEW_VERSION
 
       - name: Push changes and tag
         uses: ad-m/github-push-action@v0.6.0
