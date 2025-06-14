@@ -1,0 +1,54 @@
+name: CI and create feature tags
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  create-branch-tag:
+    runs-on: ubuntu-24.04
+    needs: ci
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Extract base version
+        id: version
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          echo "base=${BASE_VERSION%%-*}" >> $GITHUB_OUTPUT
+
+      - name: Extract branch name
+        id: branch
+        run: |
+          # Extract PR source branch name and sanitize
+          RAW_BRANCH="${{ github.head_ref }}"
+          SANITIZED_BRANCH=$(echo "$RAW_BRANCH" | tr '/' '-' | tr -cd '[:alnum:]-')
+          echo "branch=$SANITIZED_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Count previous branch tags
+        id: counter
+        run: |
+          COUNT=$(git tag --list "${{ steps.version.outputs.base }}-${{ steps.branch.outputs.branch }}.*" | wc -l)
+          NEXT=$((COUNT))
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+
+      - name: Bump branch version
+        id: bump-branch
+        run: |
+          NEW_VERSION=$(npm version prerelease --preid=${{ steps.branch.outputs.branch }} -n=${{ steps.counter.outputs.next }} --no-git-tag-version)
+          git tag ${{ NEW_VERSION }}
+
+      - name: Push changes and tag
+        uses: ad-m/github-push-action@v0.6.0
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          tags: true
