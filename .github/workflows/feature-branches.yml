@@ -43,11 +43,9 @@ jobs:
           NEXT=$((COUNT))
           echo "next=$NEXT" >> $GITHUB_OUTPUT
 
-      - name: Bump branch version
-        id: bump-branch
+      - name: Create new tag
         run: |
-          NEW_VERSION=$(npm version prerelease --preid=${{ steps.branch.outputs.branch }} -n=${{ steps.counter.outputs.next }} --no-git-tag-version)
-          git tag $NEW_VERSION
+          git tag ${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
 
       - name: Push changes and tag
         uses: ad-m/github-push-action@v0.6.0
