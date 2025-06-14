@@ -31,7 +31,9 @@ jobs:
         run: |
           # Extract PR source branch name and sanitize
           RAW_BRANCH="${{ github.head_ref }}"
-          SANITIZED_BRANCH=$(echo "$RAW_BRANCH" | tr '/' '-' | tr -cd '[:alnum:]-')
+          echo "$RAW_BRANCH"
+          SANITIZED_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+          echo "$SANITIZED_BRANCH"
           echo "branch=$SANITIZED_BRANCH" >> $GITHUB_OUTPUT
 
       - name: Count previous branch tags
