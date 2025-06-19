@@ -7,6 +7,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [result, setResult] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
 
   // base url
   const baseUrl = "/model-service";
@@ -49,6 +50,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
       const data = await response.json();
       setResult(data.prediction);
+      setFeedbackSubmitted(false);
 
       // log: result was received
       await logFrontendMetric("frontend_prediction_result");
@@ -61,6 +63,24 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
       setIsLoading(false);
     }
   };
+
+  const sendFeedback = async (isCorrect: boolean) => {
+    try {
+      await fetch(`${baseUrl}/feedback`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+          reviewText: text,
+          prediction: result,
+          isPredictionCorrect: isCorrect,
+        }),
+      });
+      setFeedbackSubmitted(true)
+    } catch (err) {
+      console.warn("Feedback submission failed:", err)
+    }
+  }
+  
 
   return (
     <div className="min-h-screen flex flex-col p-8">
@@ -112,6 +132,29 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
                 {result === 1 ? "positive" : "negative"}
               </span>
             </p>
+            {!feedbackSubmitted ? (
+              <>
+                <p className="text-sm text-gray-600">
+                  Help us improve our model. Was the prediction correct?
+                </p>
+                <div className="flex justify-center gap-4">
+                  <button
+                    onClick={() => sendFeedback(true)}
+                    className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
+                  >
+                    Correct
+                  </button>
+                  <button
+                    onClick={() => sendFeedback(false)}
+                    className="bg-red-500 text-white px-4 py-2 rounded-lg hover:bg-red-600"
+                  >
+                    Incorrect
+                  </button>
+                </div>
+              </>
+            ) : (
+              <p className="text-green-600 font-semibold">Thank you for your feedback!</p>
+            )}
           </div>
         )}
       </main>
