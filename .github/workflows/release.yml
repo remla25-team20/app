@@ -9,8 +9,7 @@ env:
   IMG: ghcr.io/${{github.repository}}
 jobs:
   build:
-    permissions: 
-      packages: write-all
+    permissions: write-all
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
