@@ -12,6 +12,9 @@ jobs:
   create-branch-tag:
     runs-on: ubuntu-24.04
     needs: ci
+    
+    outputs:
+      feature-version: ${{ steps.feature-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -58,5 +61,5 @@ jobs:
     needs: create-branch-tag
     uses: ./.github/workflows/release.yml
     with:
-      tag: ${{ steps.feature-version.outputs.version }}
+      tag: ${{ needs.create-branch-tag.outputs.feature-version }}
 
