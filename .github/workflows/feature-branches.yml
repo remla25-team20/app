@@ -50,7 +50,7 @@ jobs:
         id: feature-version
         run: |
           FEATURE_VERSION=v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
-          echo version=$FEATURE_VERSION" >> $GITHUB_OUTPUT
+          echo "version=$FEATURE_VERSION" >> $GITHUB_OUTPUT
           git tag $FEATURE_VERSION
           git push origin --tags
           
