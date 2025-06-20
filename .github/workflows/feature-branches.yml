@@ -53,9 +53,10 @@ jobs:
           echo "version=$FEATURE_VERSION" >> $GITHUB_OUTPUT
           git tag $FEATURE_VERSION
           git push origin --tags
-          
-      - name: Create feature pre-patch release
-        uses: ./.github/workflows/release.yml
-        with:
-          tag: ${{ steps.feature-version.outputs.version }}
+  
+  release-feature-prerelease:
+    needs: create-branch-tag
+    uses: ./.github/workflows/release.yml
+      with:
+        tag: ${{ steps.feature-version.outputs.version }}
 
