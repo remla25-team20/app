@@ -14,7 +14,7 @@ jobs:
     needs: ci
     
     outputs:
-      feature-version: ${{ steps.feature-version.outputs.version }}
+      version: ${{ steps.feature-version.outputs.version }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -57,10 +57,10 @@ jobs:
           git tag $FEATURE_VERSION
           git push origin --tags
   
-  release-feature-prerelease:
+  publish-branch-prerelease:
     needs: create-branch-tag
     uses: ./.github/workflows/release.yml
     with:
-      tag: ${{ needs.create-branch-tag.outputs.feature-version }}
+      tag: ${{ needs.create-branch-tag.outputs.version }}
     secrets: inherit
 
