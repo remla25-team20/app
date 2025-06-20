@@ -7,4 +7,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       tag: ${{ github.ref_name }}
+    secrets: inherit
 
