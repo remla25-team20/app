@@ -5,11 +5,11 @@ on:
       tag:
         required: true
         type: string
+permissions: write-all
 env:
   IMG: ghcr.io/${{github.repository}}
 jobs:
   build:
-    permissions: write-all
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v4
