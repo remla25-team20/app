@@ -57,6 +57,6 @@ jobs:
   release-feature-prerelease:
     needs: create-branch-tag
     uses: ./.github/workflows/release.yml
-      with:
-        tag: ${{ steps.feature-version.outputs.version }}
+    with:
+      tag: ${{ steps.feature-version.outputs.version }}
 
