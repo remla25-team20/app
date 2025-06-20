@@ -62,4 +62,5 @@ jobs:
     uses: ./.github/workflows/release.yml
     with:
       tag: ${{ needs.create-branch-tag.outputs.feature-version }}
+    secrets: inherit
 

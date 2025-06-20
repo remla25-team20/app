@@ -5,7 +5,6 @@ on:
       tag:
         required: true
         type: string
-permissions: write-all
 env:
   IMG: ghcr.io/${{github.repository}}
 jobs:
@@ -21,7 +20,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ secrets.GH_TOKEN }}
       - name: Create image tags
         id: tags
         uses: docker/metadata-action@v5
