@@ -70,3 +70,14 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
+
+      - name: Create release
+        uses: ./.github/workflows/release.yml
+        with:
+          tag: git tag ${{ steps.release.outputs.version }}
+
+      - name: Create pre-patch release
+        uses: ./.github/workflows/release.yml
+        with:
+          tag: ${{ steps.pre-patch.outputs.version }}
+

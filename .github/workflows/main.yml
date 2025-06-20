@@ -40,3 +40,9 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
+
+      - name: Create pre-patch release
+        uses: ./.github/workflows/release.yml
+        with:
+          tag: ${{ steps.bump-prerelease.outputs.version }}
+

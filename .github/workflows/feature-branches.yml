@@ -47,6 +47,15 @@ jobs:
           echo "next=$NEXT" >> $GITHUB_OUTPUT
 
       - name: Create new tag
+        id: feature-version
         run: |
-          git tag v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
+          FEATURE_VERSION=v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
+          echo version=$FEATURE_VERSION" >> $GITHUB_OUTPUT
+          git tag $FEATURE_VERSION
           git push origin --tags
+          
+      - name: Create feature pre-patch release
+        uses: ./.github/workflows/release.yml
+        with:
+          tag: ${{ steps.feature-version.outputs.version }}
+
