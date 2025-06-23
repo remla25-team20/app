@@ -10,9 +10,24 @@ import {
   Button,
 } from "@heroui/react";
 
+const baseUrl = "/model-service";
+
 export default function ModelDropdown() {
   const [items, setItems] = useState<{ key: string; label: string }[]>([]);
   const [selectedKey, setSelectedKey] = useState<string>("");
+
+  const setModelVersion = async (version: string) => {
+    try {
+      await fetch(`${baseUrl}/set-model`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ version }),
+      });
+      console.log("Model version set to:", version);
+    } catch (err) {
+      console.error("Failed to set model version:", err);
+    }
+  }
 
   useEffect(() => {
     console.log("[ModelDropdown] fetching model list…");
@@ -50,25 +65,7 @@ export default function ModelDropdown() {
           const version = key as string;
           setSelectedKey(version);
           console.log("[ModelDropdown] user selected version:", version);
-
-          fetch("api/version", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ version }),
-          })
-            .then((res) => {
-              console.log(
-                "[ModelDropdown] POST /api/version status:",
-                res.status
-              );
-              return res.json();
-            })
-            .then((json) =>
-              console.log("[ModelDropdown] POST response body:", json)
-            )
-            .catch((err) =>
-              console.error("[ModelDropdown] publish version failed:", err)
-            );
+          setModelVersion(version);
         }}
       >
         {(item) => (

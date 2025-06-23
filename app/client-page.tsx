@@ -82,7 +82,6 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     }
   }
   
-
   return (
     <div className="min-h-screen flex flex-col p-8">
       <div className="fixed top-20 left-20 z-50">
