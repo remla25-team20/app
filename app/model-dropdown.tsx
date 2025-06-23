@@ -37,8 +37,19 @@ export default function ModelDropdown() {
       <DropdownMenu
         aria-label="Select a model version"
         items={items}
-        onAction={(key) => setSelectedKey(key as string)}
-      >
+        onAction={(key) => {
+          const version = key as string;
+          setSelectedKey(version);
+
+          fetch("/api/version", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ version }),
+          }).catch((err) =>
+            console.error("Failed to publish new version:", err)
+          );
+        }}
+        >
         {(item) => (
           <DropdownItem key={item.key}>
             {item.label}
