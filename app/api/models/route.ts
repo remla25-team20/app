@@ -1,6 +1,5 @@
 
 import { readdir } from "fs/promises";
-import path from "path";
 
 export async function GET() {
   const MODELS_DIR = "/mnt/shared/models";
