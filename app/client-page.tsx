@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ModelDropdown from "./model-dropdown";
 
 export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [text, setText] = useState("");
@@ -84,6 +85,9 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
 
   return (
     <div className="min-h-screen flex flex-col p-8">
+      <div className="fixed top-20 left-20 z-50">
+        <ModelDropdown />
+      </div>
       <main className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full">
         <h1 className="text-3xl font-bold mb-8">Text Sentiment Analysis</h1>
 
