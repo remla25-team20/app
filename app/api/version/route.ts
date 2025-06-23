@@ -22,6 +22,7 @@ export async function POST(request: Request) {
   const { version } = await request.json();
   try {
     await fs.writeFile(VERSION_FILE, version, "utf-8");
+    await fs.chmod(VERSION_FILE, 0o660);
   } catch (err: unknown) {
     console.error("POST /api/version error:", err);
     return NextResponse.json(
