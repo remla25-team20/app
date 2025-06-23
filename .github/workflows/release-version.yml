@@ -21,6 +21,11 @@ jobs:
     runs-on: ubuntu-24.04
     if: github.ref == 'refs/heads/main'
     needs: ci
+    outputs:
+      release:
+        version: ${{ steps.release.outputs.version }}
+      pre-patch:
+        version: ${{ steps.pre-patch.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
@@ -70,3 +75,18 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
+
+  publish-release:
+    needs: create-release-candidate
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.create-release-candidate.outputs.release.version }}
+    secrets: inherit
+  
+  publish-pre-patch:
+    needs: create-release-candidate
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.create-release-candidate.outputs.pre-patch.version }}
+    secrets: inherit
+

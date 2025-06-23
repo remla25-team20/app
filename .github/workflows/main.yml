@@ -12,6 +12,8 @@ jobs:
   create-release-candidate:
     runs-on: ubuntu-24.04
     needs: ci
+    outputs:
+      version: ${{ steps.bump-prerelease.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
@@ -40,3 +42,11 @@ jobs:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           branch: ${{ github.ref }}
           tags: true
+
+  publish-release-candidate:
+    needs: create-release-candidate
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.create-release-candidate.outputs.version }}
+    secrets: inherit
+
