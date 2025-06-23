@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { promises as fs } from "fs";
 
-const VERSION_FILE = "/mnt/shared/models/selected.txt";
+const VERSION_FILE = "/mnt/shared/models/selected.model";
 
 export async function GET() {
   let version = "";

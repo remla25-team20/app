@@ -15,14 +15,23 @@ export default function ModelDropdown() {
   const [selectedKey, setSelectedKey] = useState<string>("");
 
   useEffect(() => {
-    fetch("/api/models")
-      .then((res) => res.json())
+    console.log("[ModelDropdown] fetching model list…");
+    fetch("api/models")
+      .then((res) => {
+        console.log("[ModelDropdown] /api/models response:", res.status);
+        return res.json();
+      })
       .then(({ models }) => {
+        console.log("[ModelDropdown] models payload:", models);
         const mapped = models.map((tag: string) => ({ key: tag, label: tag }));
         setItems(mapped);
-        if (mapped.length) setSelectedKey(mapped[0].key);
+        if (mapped.length) {
+          setSelectedKey(mapped[0].key);
+        }
       })
-      .catch((err) => console.error(err));
+      .catch((err) =>
+        console.error("[ModelDropdown] fetch models failed:", err)
+      );
   }, []);
 
   const selectedLabel =
@@ -40,20 +49,30 @@ export default function ModelDropdown() {
         onAction={(key) => {
           const version = key as string;
           setSelectedKey(version);
+          console.log("[ModelDropdown] user selected version:", version);
 
-          fetch("/api/version", {
+          fetch("api/version", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify({ version }),
-          }).catch((err) =>
-            console.error("Failed to publish new version:", err)
-          );
+          })
+            .then((res) => {
+              console.log(
+                "[ModelDropdown] POST /api/version status:",
+                res.status
+              );
+              return res.json();
+            })
+            .then((json) =>
+              console.log("[ModelDropdown] POST response body:", json)
+            )
+            .catch((err) =>
+              console.error("[ModelDropdown] publish version failed:", err)
+            );
         }}
-        >
+      >
         {(item) => (
-          <DropdownItem key={item.key}>
-            {item.label}
-          </DropdownItem>
+          <DropdownItem key={item.key}>{item.label}</DropdownItem>
         )}
       </DropdownMenu>
     </Dropdown>
