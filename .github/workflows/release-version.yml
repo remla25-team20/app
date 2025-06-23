@@ -22,10 +22,8 @@ jobs:
     if: github.ref == 'refs/heads/main'
     needs: ci
     outputs:
-      release:
-        version: ${{ steps.release.outputs.version }}
-      pre-patch:
-        version: ${{ steps.pre-patch.outputs.version }}
+      release-version: ${{ steps.release.outputs.version }}
+      pre-patch-version: ${{ steps.pre-patch.outputs.version }}
     steps:
       - uses: actions/checkout@v4
       
@@ -80,13 +78,13 @@ jobs:
     needs: create-release-candidate
     uses: ./.github/workflows/release.yml
     with:
-      tag: ${{ needs.create-release-candidate.outputs.release.version }}
+      tag: ${{ needs.create-release-candidate.outputs.release-version }}
     secrets: inherit
   
   publish-pre-patch:
     needs: create-release-candidate
     uses: ./.github/workflows/release.yml
     with:
-      tag: ${{ needs.create-release-candidate.outputs.pre-patch.version }}
+      tag: ${{ needs.create-release-candidate.outputs.pre-patch-version }}
     secrets: inherit
 
