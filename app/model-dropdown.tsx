@@ -10,24 +10,14 @@ import {
   Button,
 } from "@heroui/react";
 
-const baseUrl = "/model-service";
-
-export default function ModelDropdown() {
+export default function ModelDropdown({
+  selectedModel,
+  onChange,
+}: {
+  selectedModel: string;
+  onChange: (version: string) => void;
+}) {
   const [items, setItems] = useState<{ key: string; label: string }[]>([]);
-  const [selectedKey, setSelectedKey] = useState<string>("");
-
-  const setModelVersion = async (version: string) => {
-    try {
-      await fetch(`${baseUrl}/set-model`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version }),
-      });
-      console.log("Model version set to:", version);
-    } catch (err) {
-      console.error("Failed to set model version:", err);
-    }
-  }
 
   useEffect(() => {
     console.log("[ModelDropdown] fetching model list…");
@@ -41,7 +31,7 @@ export default function ModelDropdown() {
         const mapped = models.map((tag: string) => ({ key: tag, label: tag }));
         setItems(mapped);
         if (mapped.length) {
-          setSelectedKey(mapped[0].key);
+          onChange(mapped[0].key);
         }
       })
       .catch((err) =>
@@ -50,7 +40,7 @@ export default function ModelDropdown() {
   }, []);
 
   const selectedLabel =
-    items.find((it) => it.key === selectedKey)?.label || "Select a model";
+    items.find((it) => it.key === selectedModel)?.label || "Select a model";
 
   return (
     <Dropdown>
@@ -63,9 +53,8 @@ export default function ModelDropdown() {
         items={items}
         onAction={(key) => {
           const version = key as string;
-          setSelectedKey(version);
+          onChange(version);
           console.log("[ModelDropdown] user selected version:", version);
-          setModelVersion(version);
         }}
       >
         {(item) => (
