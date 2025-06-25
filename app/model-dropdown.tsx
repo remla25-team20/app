@@ -10,6 +10,9 @@ import {
   Button,
 } from "@heroui/react";
 
+// base url
+const baseUrl = "/model-service";
+
 export default function ModelDropdown({
   selectedModel,
   onChange,
@@ -20,23 +23,30 @@ export default function ModelDropdown({
   const [items, setItems] = useState<{ key: string; label: string }[]>([]);
 
   useEffect(() => {
-    console.log("[ModelDropdown] fetching model list…");
-    fetch("api/models")
-      .then((res) => {
-        console.log("[ModelDropdown] /api/models response:", res.status);
-        return res.json();
-      })
-      .then(({ models }) => {
-        console.log("[ModelDropdown] models payload:", models);
-        const mapped = models.map((tag: string) => ({ key: tag, label: tag }));
-        setItems(mapped);
-        if (mapped.length) {
-          onChange(mapped[0].key);
-        }
-      })
-      .catch((err) =>
-        console.error("[ModelDropdown] fetch models failed:", err)
-      );
+    const fetchModelVersions = () => {
+      console.log("[ModelDropdown] fetching model list…");
+      fetch(`${baseUrl}/model-versions`)
+        .then((res) => {
+          console.log(`[ModelDropdown] ${baseUrl}/model-versions response:`, res.status);
+          return res.json();
+        })
+        .then(({ modelVersions }) => {
+          console.log("[ModelDropdown] modelVersions payload:", modelVersions);
+          const mapped = modelVersions.map((tag: string) => ({ key: tag, label: tag }));
+          setItems(mapped);
+          if (mapped.length > 0) {
+            onChange(mapped[0].key);
+          } else {
+            // try again if model-service didn't get to download any models yet
+            console.log("[ModelDropdown] /model-versions returned empty list; will query again in 3s")
+            setTimeout(fetchModelVersions, 3_000)
+          }
+        })
+        .catch((err) =>
+          console.error("[ModelDropdown] fetch models failed:", err)
+        );
+    };
+    fetchModelVersions();
   }, []);
 
   const selectedLabel =
