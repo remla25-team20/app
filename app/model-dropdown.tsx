@@ -10,47 +10,47 @@ import {
   Button,
 } from "@heroui/react";
 
+// base url
 const baseUrl = "/model-service";
 
-export default function ModelDropdown() {
+export default function ModelDropdown({
+  selectedModel,
+  onChange,
+}: {
+  selectedModel: string;
+  onChange: (version: string) => void;
+}) {
   const [items, setItems] = useState<{ key: string; label: string }[]>([]);
-  const [selectedKey, setSelectedKey] = useState<string>("");
-
-  const setModelVersion = async (version: string) => {
-    try {
-      await fetch(`${baseUrl}/set-model`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ version }),
-      });
-      console.log("Model version set to:", version);
-    } catch (err) {
-      console.error("Failed to set model version:", err);
-    }
-  }
 
   useEffect(() => {
-    console.log("[ModelDropdown] fetching model list…");
-    fetch("api/models")
-      .then((res) => {
-        console.log("[ModelDropdown] /api/models response:", res.status);
-        return res.json();
-      })
-      .then(({ models }) => {
-        console.log("[ModelDropdown] models payload:", models);
-        const mapped = models.map((tag: string) => ({ key: tag, label: tag }));
-        setItems(mapped);
-        if (mapped.length) {
-          setSelectedKey(mapped[0].key);
-        }
-      })
-      .catch((err) =>
-        console.error("[ModelDropdown] fetch models failed:", err)
-      );
+    const fetchModelVersions = () => {
+      console.log("[ModelDropdown] fetching model list…");
+      fetch(`${baseUrl}/model-versions`)
+        .then((res) => {
+          console.log(`[ModelDropdown] ${baseUrl}/model-versions response:`, res.status);
+          return res.json();
+        })
+        .then(({ modelVersions }) => {
+          console.log("[ModelDropdown] modelVersions payload:", modelVersions);
+          const mapped = modelVersions.map((tag: string) => ({ key: tag, label: tag }));
+          setItems(mapped);
+          if (mapped.length > 0) {
+            onChange(mapped[0].key);
+          } else {
+            // try again if model-service didn't get to download any models yet
+            console.log("[ModelDropdown] /model-versions returned empty list; will query again in 3s")
+            setTimeout(fetchModelVersions, 3_000)
+          }
+        })
+        .catch((err) =>
+          console.error("[ModelDropdown] fetch models failed:", err)
+        );
+    };
+    fetchModelVersions();
   }, []);
 
   const selectedLabel =
-    items.find((it) => it.key === selectedKey)?.label || "Select a model";
+    items.find((it) => it.key === selectedModel)?.label || "Select a model";
 
   return (
     <Dropdown>
@@ -63,9 +63,8 @@ export default function ModelDropdown() {
         items={items}
         onAction={(key) => {
           const version = key as string;
-          setSelectedKey(version);
+          onChange(version);
           console.log("[ModelDropdown] user selected version:", version);
-          setModelVersion(version);
         }}
       >
         {(item) => (
