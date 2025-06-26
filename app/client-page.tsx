@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import ModelDropdown from "./model-dropdown";
 
 export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [text, setText] = useState("");
@@ -8,6 +9,7 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [feedbackSubmitted, setFeedbackSubmitted] = useState(false);
+  const [selectedModel, setSelectedModel] = useState<string>("");
 
   // base url
   const baseUrl = "/model-service";
@@ -39,10 +41,15 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     await logFrontendMetric("frontend_submit_clicked");
 
     try {
-      const params = new URLSearchParams({ review: text });
+      const params = new URLSearchParams({ 
+        review: text,
+        modelVersion: selectedModel, 
+      });
       const response = await fetch(`${baseUrl}/predict?${params.toString()}`, {
         method: "POST",
       });
+
+      console.log("/predict request with modelVersion=", selectedModel)
 
       if (!response.ok) {
         throw new Error("Failed to get prediction");
@@ -81,9 +88,11 @@ export default function ClientPage({ libVersion }: { libVersion: string }) {
     }
   }
   
-
   return (
     <div className="min-h-screen flex flex-col p-8">
+      <div className="fixed top-20 left-20 z-50">
+        <ModelDropdown selectedModel={selectedModel} onChange={setSelectedModel} />
+      </div>
       <main className="flex-1 flex flex-col items-center justify-center max-w-2xl mx-auto w-full">
         <h1 className="text-3xl font-bold mb-8">Text Sentiment Analysis</h1>
 

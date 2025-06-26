@@ -1,0 +1,66 @@
+name: CI and create feature tags
+
+on:
+  push:
+    branches-ignore:
+      - main
+
+jobs:
+  ci:
+    uses: ./.github/workflows/ci.yml
+
+  create-branch-tag:
+    runs-on: ubuntu-24.04
+    needs: ci
+    
+    outputs:
+      version: ${{ steps.feature-version.outputs.version }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          fetch-tags: true
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+
+      - name: Extract base version
+        id: version
+        run: |
+          BASE_VERSION=$(node -p "require('./package.json').version")
+          echo "base=${BASE_VERSION%%-*}" >> $GITHUB_OUTPUT
+
+      - name: Extract branch name
+        id: branch
+        run: |
+          # Extract PR source branch name and sanitize
+          RAW_BRANCH="${{ github.head_ref }}"
+          echo "$RAW_BRANCH"
+          SANITIZED_BRANCH=$(git rev-parse --abbrev-ref HEAD | tr '/' '-')
+          echo "$SANITIZED_BRANCH"
+          echo "branch=$SANITIZED_BRANCH" >> $GITHUB_OUTPUT
+
+      - name: Count previous branch tags
+        id: counter
+        run: |
+          COUNT=$(git tag --list "v${{ steps.version.outputs.base }}-${{ steps.branch.outputs.branch }}.*" | wc -l)
+          NEXT=$((COUNT))
+          echo "next=$NEXT" >> $GITHUB_OUTPUT
+
+      - name: Create new tag
+        id: feature-version
+        run: |
+          FEATURE_VERSION=v${{ steps.version.outputs.base}}-${{ steps.branch.outputs.branch}}.${{ steps.counter.outputs.next }}
+          echo "version=$FEATURE_VERSION" >> $GITHUB_OUTPUT
+          git tag $FEATURE_VERSION
+          git push origin --tags
+  
+  publish-branch-prerelease:
+    needs: create-branch-tag
+    uses: ./.github/workflows/release.yml
+    with:
+      tag: ${{ needs.create-branch-tag.outputs.version }}
+    secrets: inherit
+
